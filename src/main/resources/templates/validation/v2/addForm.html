@@ -24,39 +24,36 @@
 
     <form action="item.html" th:action th:object="${item}" method="post">
 
-        <div th:if="${errors?.containsKey('globalError')}">
-            <p class="field-error" th:text="${errors['globalError']}">전체 오류 메시지</p>
+        <!-- /* #fields. 으로 BindingResult를 활용해서 검증 오류를 표현하는 기능을 사용, BindingResult ObjectError(GlobalError)에 오류가 있을 때 마다 for:each문으로 err에 하나씩 넣어줌 */-->
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
         </div>
 
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
-            <!-- /* 오류가 있으면 form-control, field-error css 둘 다, 아니라면 폼 데이터만 */-->
-            <!-- /* errors? -> null 일 때 그냥 통으로 null로 처리해서 반환, errors. 이런 식 이었으면 NPE 터짐(null. 이 되는 꼴이니) */-->
+            <!-- /* th:errorclass => th:field 명으로 된 오류가 있으면 이 에러 났을 때의 전용 클래스를 추가 */-->
             <input type="text" id="itemName" th:field="*{itemName}"
-                   th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'"
+                   th:errorclass="field-error"
                    class="form-control" placeholder="이름을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">
+            <div class="field-error" th:errors="*{itemName}"> <!--/* 컨트롤러안에 BindingResult에 설정한 FieldName이 여기로 바인딩돼서 에러가 있으면 출력되고 안되면 출력 안됨.(th:if 편의 버전) */-->
                 상품명 오류
             </div>
         </div>
         <div>
             <label for="price" th:text="#{label.item.price}">가격</label>
-            <!-- /* classappend 를 사용해서 해당 필드에 오류가 있으면 `field-error' 라는 클래스 정보를 더해서(+)
-                    폼의 색깔을 빨간색으로 강조한다. 만약 값이 없으면 `_` (No-Operation)을 사용해서 아무것도 하지 않는다. */-->
             <input type="text" id="price" th:field="*{price}"
-                   th:classappend="${errors?.containsKey('price')} ? 'field-error' : _"
+                   th:errorclass="field-error"
                    class="form-control" placeholder="가격을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('price')}" th:text="${errors['price']}">
+            <div class="field-error" th:errors="*{price}">
                 상품 가격 오류
         </div>
         <div>
             <label for="quantity" th:text="#{label.item.quantity}">수량</label>
             <input type="text" id="quantity" th:field="*{quantity}"
-                   th:class="${errors?.containsKey('quantity')} ? 'form-control field-error' : 'form-control'"
-                   class="form-control" placeholder="가격을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('quantity')}" th:text="${errors['quantity']}">
-                상품 수량 오류
+                   th:errorclass="field-error"
                    class="form-control" placeholder="수량을 입력하세요">
+            <div class="field-error" th:errors="*{quantity}">
+                상품 수량 오류
         </div>
 
         <hr class="my-4">
@@ -68,7 +65,7 @@
             <div class="col">
                 <button class="w-100 btn btn-secondary btn-lg"
                         onclick="location.href='items.html'"
-                        th:onclick="|location.href='@{/validation/v1/items}'|"
+                        th:onclick="|location.href='@{/validation/v2/items}'|"
                         type="button" th:text="#{button.cancel}">취소</button>
             </div>
         </div>
